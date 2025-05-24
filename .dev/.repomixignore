@@ -1,0 +1,12 @@
+# Add patterns to ignore here, one per line
+# Example:
+# *.log
+# tmp/
+
+workspace-template/
+.repomixignore
+repomix.config.*
+repomix-output*
+*.ja.md
+*.old.md
+# all-instructions.md

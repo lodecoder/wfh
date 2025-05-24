@@ -1,0 +1,5 @@
+# .dev
+repomix-output*
+rules/
+misc/
+workspace-template/
