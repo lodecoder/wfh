@@ -1,11 +1,10 @@
+# 概要
+
 output-repomix-dot-env.xml はタスク管理ワークフローです。
 これをサポートするためのコマンドラインツールを作成しようとしています。
 以下はそのツールの仕様書です。
 
-
-
-``````md
-# workflow-helper 開発環境
+# workflow-helper (wfh) 開発環境
 
 - dotnet core (.NET 8)
 - Win32 API を使うので下記の設定
@@ -29,15 +28,18 @@ output-repomix-dot-env.xml はタスク管理ワークフローです。
 ```sh
 1. root/.dev/workspace-1
 2. root/.dev/workspace-2
-3. (create new)
-4. (入力して指定)
+3. (新規作成)
+4. (入力して指定...)
 ```
-"(create new)" の場合は working directory 直下に ".dev/" がある場合、または working directory が ".dev/" の場合は ".dev/workspace-template/" を ".dev/workspace-${sequence}/" にコピーしてそこをワークスペースとする (${sequence} の部分は 1 から win32api で作成して例外が起こらないパスをインクリメントして自動で決定する)。また、コピー後に、コピーしたワークスペースの `.dev/workspace-${sequence}/misc/.gitignore` を `.dev/workspace-${sequence}/.gitignore` に移動する。
-"(入力して指定)" を選んだ場合は ConsoleReadLine() でパスを入力し、そのパスが (`/\.dev\/workspace-[0-9]+\/?$/`) にマッチする場合はそれをワークスペースとして選び、 working directory としてセット、コンソールタイトルに `wfh - ワークスペース: ${path}` をセット。
+"(新規作成)" の場合は working directory 直下に ".dev/" がある場合、または working directory が ".dev/" の場合は ".dev/workspace-template/" を ".dev/workspace-${sequence}/" にコピーしてそこをワークスペースとする (${sequence} の部分は 1 から win32api で作成して例外が起こらないパスをインクリメントして自動で決定する)。また、コピー後に、コピーしたワークスペースの `.dev/workspace-${sequence}/misc/.gitignore` を `.dev/workspace-${sequence}/.gitignore` に移動する。
+"(入力して指定...)" を選んだ場合は ConsoleReadLine() でパスを入力し、そのパスが (`/\.dev\/workspace-[0-9]+\/?$/`) にマッチする場合はそれをワークスペースとして選ぶ
 	
 ※ `wfh auto` または `wfh a` で起動した場合は、 見つかった `workspace-*/` が1つの場合はそれを自動で選択する。
 ※ `wfh force` または `wfh f` で起動した場合は、見つかった `workspace-*/` のうち ${sequence} が一番大きいものを選択。
 
+ワークスペースが決定したら
+- ワークスペースを working directory としてセット
+- コンソールタイトルに `wfh - ワークスペース: ${path}` をセット。
 
 ## 2. 選択したワークスペース上でコマンドを実行する
 
@@ -64,59 +66,67 @@ output-repomix-dot-env.xml はタスク管理ワークフローです。
   - 動作: `.dev/rules/make-order-instruction.md` を指示するためのプロンプト `make-order-prompt.md` をクリップボードにコピー
     - 「make-order-prompt をクリップボードにコピーしました」とメッセージ表示
   - 引数: なし
-  - コマンドリストでの表示: `3. make-order  # make-order-prompt.md をクリップボードにコピー`
+  - コマンドリストでの表示: `3. make-order  # make-order-prompt をクリップボードにコピー`
   - コマンドリストに表示する条件: `draft-.*(?<!\.ja)\.md` のファイルが存在する かつ `order-.*(?<!\.ja)\.md` のファイルが存在しない場合
 4. make-plan
   - 動作: `.dev/rules/make-plan-instruction.md` を指示するためのプロンプト `make-plan-prompt.md` をクリップボードにコピー
     - 「make-plan-prompt をクリップボードにコピーしました」とメッセージ表示
   - 引数: なし
-  - コマンドリストでの表示: `4. make-plan  # make-plan-prompt.md をクリップボードにコピー`
+  - コマンドリストでの表示: `4. make-plan  # make-plan-prompt をクリップボードにコピー`
   - コマンドリストに表示する条件: `order-.*(?<!\.ja)\.md` のファイルが存在する かつ `plan-.*(?<!\.ja)\.md` のファイルが存在しない場合
 5. step
   - 動作: `.dev/rules/step-instruction.md` を指示するためのプロンプト `step-prompt.md` をクリップボードにコピー
     - 「step-prompt をクリップボードにコピーしました」とメッセージ表示
   - 引数: なし
-  - コマンドリストでの表示: `5. step  # step-prompt.md をクリップボードにコピー`
+  - コマンドリストでの表示: `5. step  # step-prompt をクリップボードにコピー`
   - コマンドリストに表示する条件: `plan-.*(?<!\.ja)\.md` のファイルが存在する場合
 6. tidy
-  - 動作: retrospective.md を作成する指示のプロンプト `tidy-retrospective.md` をクリップボードにコピー
-    - 「tidy-retrospective をクリップボードにコピーしました」とメッセージ表示
+  - 動作: retrospective.md を作成する指示のプロンプト `tidy-prompt.md` をクリップボードにコピー
+    - 「tidy-prompt をクリップボードにコピーしました」とメッセージ表示
   - 引数: なし
-  - コマンドリストでの表示: `6. tidy-retrospective  # tidy-retrospective.md をコピー`
+  - コマンドリストでの表示: `6. tidy  # tidy-prompt をクリップボードにコピー`
   - コマンドリストに表示する条件: `step-.+\.md` にマッチするファイルが1つでも存在する場合
-8. breakdown-todo
+7. breakdown-todo
   - 動作: `.dev/rules/breakdown-todo-instruction.md` を実行するためのプロンプト `breakdown-todo-prompt.md` をクリップボードにコピー
     - 「breakdown-todo-prompt をクリップボードにコピーしました」とメッセージ表示
   - 引数: なし
-  - コマンドリストでの表示: `8. breakdown-todo  # タスク分割プロンプトのコピー`
-9. repomix
+  - コマンドリストでの表示: `7. breakdown-todo  # タスク分割プロンプトのコピー`
+8. repomix
   - 動作: `cd "workspace-*/" && repomix` をコマンド実行
-  - コマンドリストでの表示: `9. repomix  # ワークスペースでrepomixを実行`
-10. tree
+  - コマンドリストでの表示: `8. repomix  # ワークスペースでrepomixを実行`
+9. tree
   - 動作: ワークスペースをツリー表示 (最大4階層)
   - 引数(オプション): `tree --parent` または `tree -p` で ".dev/" をツリー表示
-  - コマンドリストでの表示: `10. tree [--parent|-p]  # ワークスペースをツリー表示`
-11. open-workspace
+  - コマンドリストでの表示: `9. tree [--parent|-p]  # ワークスペースをツリー表示`
+10. open-workspace
   - 動作: ワークスペースをエクスプローラーで開く
   - 引数: なし
-  - コマンドリストでの表示: `11. open-workspace # ワークスペースをエクスプローラーで開く`
-12. status
+  - コマンドリストでの表示: `10. open-workspace # ワークスペースをエクスプローラーで開く`
+11. status
   - 動作: plan-*.md から steps の todo list を抽出してコンソールに表示
   - 引数: なし
-  - コマンドリストでの表示: `12. status  # plan から todo list を表示`
+  - コマンドリストでの表示: `11. status  # plan から todo list を表示`
   - コマンドリストに表示する条件: `plan-.*(?<!\.ja)\.md` のファイルが存在する場合
-7. complete-workspace
+12. complete-workspace
   - 動作: ワークスペースを `.dev/done/${yyyy}/${yyyy-MM-dd}-${title}/` に移動 (移動先ディレクトリをwin32apiで作成、失敗時は中止)。移動成功したら再びワークスペースを決定する最初の処理へ戻る
   - 引数: なし
-  - コマンドリストでの表示: `7. complete-workspace [title]  # ワークスペースを done フォルダへ移動して完了する`
+  - コマンドリストでの表示: `12. complete-workspace [title]  # ワークスペースを done フォルダへ移動して完了する`
   - コマンドリストに表示する条件: `step-.+\.md` にマッチするファイルが1つでも存在する場合
   - 引数(オプション): 作成するディレクトリの${title}部分の値 (ディレクトリ名に利用できない文字が含まれる場合は中止)
     - 引数を指定しなかった場合は Console.ReadLine で入力
+13. help
+  - 動作: 各コマンドのヘルプを表示する
+  - 引数(オプション): ヘルプを表示するコマンドを引数に受ける(インクリメンタルサーチでコマンド検索)
+  - コマンドリストでの表示: `13. help [command]  # コマンドのヘルプを表示`
 
 ※ 非表示のコマンドがあっても番号をそのぶん詰めないこと。
 ※ インクリメンタルサーチ(例: "diff-order" であれば /^di?f?f?-*or?d?e?r?$/i )でマッチするコマンド または コマンド番号のコマンド を実行 (複数のコマンドがマッチしたら処理はせず、マッチしたコマンドをリスト表示して、再度入力を促すようにする)
 
 # その他の仕様
+
+## コマンドの順番
+
+IWorkspaceCommand を継承したコマンドクラスを表示したい順番で配列で定義する。コマンド番号は 配列のインデックス + 1 の値となる。
 
 ## エラー時の処理
 
@@ -133,12 +143,24 @@ kuri.exe, WinMerge.exe, repomix がインストールされていない場合、
 3.    make-order          # make-order-prompt.md をクリップボードにコピー
 ```
 
-番号は Cyan, 説明は Green でansii色をつける。
+番号は Cyan, 説明は Green でansiエスケープシーケンスで色をつける。
+
+## statusコマンドの出力例
+```
+Plan: ログイン機能の実装
+Progress: 3/7 steps completed
+
+✓ Step 1: Login Interface Foundation
+✓ Step 2: Client-Side Validation Implementation  
+✓ Step 3: Backend API Integration Planning
+   Step 4: Authentication Service Implementation
+   Step 5: Session Management and Security
+```
 
 ## プレースホルダーの仕様
 
 - 置換できないプレースホルダーがある場合は警告を黄色の字で表示
-- プレースホルダーにマッチする正規表現は `[GeneratedRegex(@"{([0-9a-zA-Z_]*)}")]`
+- プレースホルダーにマッチする正規表現は `[GeneratedRegex(@"\$\{([0-9a-zA-Z_]*)\}")]`
 
 ### ${xxx} のプレースホルダーについて、使用可能な変数のリスト
 - ${sequence} - ワークスペース番号 (`workspace-${sequence}` のように利用される)
@@ -165,7 +187,7 @@ using System.Runtime.InteropServices;
 
 public static partial class DirectoryHelper
 {
-    [LibraryImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [LibraryImport("kernel32.dll", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
     private static partial bool CreateDirectoryW(string lpPathName, IntPtr lpSecurityAttributes);
 
     [LibraryImport("kernel32.dll")]
@@ -272,5 +294,3 @@ partial class MessageGenerator(DateTimeOffset Time, DateTimeOffset StartTime, Da
     private static partial Regex TagMatcher();
 }
 ```
-
-``````
